@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+confluent-kafka
+elasticsearch>=8.0.0
+sentence-transformers
+numpy
+requests
+pydantic
+python-dotenv
+pdfplumber
+pytesseract
+Pillow

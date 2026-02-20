@@ -1,0 +1,27 @@
+
+spring:
+  application:
+    name: StorageService
+
+minio:
+  url: http://127.0.0.1:9000
+  access-key: t7WyDxmvVYeuN7RTztzD
+  secret-key: UyeMcKooejssOyr0NHqNB8rcFzHcZ5Y4j9LVxRpE
+  bucket: cloud-storage-files
+
+#kafka:
+#  bootstrap-servers: localhost:29092
+
+#metadata:
+#  service-url: http://localhost:8081    # ????? metadata-service (dev)
+
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,prometheus
+    endpoint:
+      health:
+        show-details: always
+server:
+  port: 8080
