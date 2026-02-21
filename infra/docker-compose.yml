@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
 
   # =====================
@@ -26,7 +24,7 @@ services:
   # =====================
   # PostgreSQL
   # =====================
-  postgres:
+  postgres-metadata:
     image: postgres:16
     container_name: postgres
     environment:
@@ -42,6 +40,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  postgres-auth:
+    image: postgres:15
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: auth-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis:7
+    container_name: auth-redis
+    ports:
+      - "6379:6379"
+
 
   # =====================
   # Zookeeper
@@ -87,14 +102,14 @@ services:
       - cluster.name=cloud-storage-cluster
       - discovery.type=single-node
 
-      # ❗ ОБЯЗАТЕЛЬНО для vector search
+      # vector search
       - xpack.security.enabled=false
       - xpack.security.http.ssl.enabled=false
 
-      # Память (минимум для нормальной работы)
+      # Память
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
 
-      # Включаем knn
+      # knn
       - xpack.ml.enabled=false
 
     ulimits:
@@ -102,8 +117,6 @@ services:
         soft: -1
         hard: -1
 
-    volumes:
-      - es-data:/usr/share/elasticsearch/data
 
     ports:
       - "9200:9200"
