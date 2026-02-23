@@ -45,6 +45,7 @@
     <dependencyManagement>
         <dependencies>
 
+
             <!-- Spring Cloud BOM -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

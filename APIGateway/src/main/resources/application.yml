@@ -1,0 +1,10 @@
+server:
+  port: 8080
+  http2:
+    enabled: false
+spring:
+  application:
+    name: api-gateway
+
+jwt:
+  secret: c2Vlbm1lZXR0cnllbmVteWFwcGxlbm90ZXN3aW5nbG9zdGdyYXNzeWVzZmlmdHlzZW4=

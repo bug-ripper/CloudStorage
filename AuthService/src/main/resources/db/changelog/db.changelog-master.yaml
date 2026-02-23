@@ -1,3 +1,7 @@
-<databaseChangeLog>
-    <include file="db/changelog/001-init.xml"/>
-</databaseChangeLog>
+databaseChangeLog:
+  - include:
+      file: db/changelog/001-init-schema.yaml
+  - include:
+      file: db/changelog/002-init-roles.yaml
+  - include:
+      file: db/changelog/003-init-users.yaml

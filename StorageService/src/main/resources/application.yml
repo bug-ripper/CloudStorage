@@ -2,12 +2,22 @@
 spring:
   application:
     name: StorageService
+  servlet:
+    multipart:
+      # Включаем поддержку multipart (в Spring Boot обычно true по умолчанию)
+      enabled: true
+      # Максимальный размер ОДНОГО файла
+      max-file-size: 50MB
+      # Максимальный размер ВСЕГО запроса (файл + текстовые поля + заголовки)
+      max-request-size: 55MB
+      # Порог, после которого файл пишется на диск, а не держится в памяти
+      file-size-threshold: 2KB
 
 minio:
   url: http://127.0.0.1:9000
-  access-key: t7WyDxmvVYeuN7RTztzD
-  secret-key: UyeMcKooejssOyr0NHqNB8rcFzHcZ5Y4j9LVxRpE
-  bucket: cloud-storage-files
+  access-key: minioadmin
+  secret-key: minioadmin
+  bucket: cloud-storage
 
 #kafka:
 #  bootstrap-servers: localhost:29092
@@ -24,4 +34,10 @@ minio:
       health:
         show-details: always
 server:
-  port: 8080
+  port: 8082
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    # Это покажет сырой HTTP поток, если нужно копнуть глубже
+    org.apache.coyote.http11: DEBUG

@@ -1,1 +1,20 @@
-spring.application.name=AuthService
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auth-service
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  secret: c2Vlbm1lZXR0cnllbmVteWFwcGxlbm90ZXN3aW5nbG9zdGdyYXNzeWVzZmlmdHlzZW4=
+  access-token-expiration: 15m
+  refresh-token-expiration: 7d

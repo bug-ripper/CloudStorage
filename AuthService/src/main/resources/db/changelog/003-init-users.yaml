@@ -1,0 +1,32 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: insert-admin-user
+      author: denis
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: password
+                  value: "$2a$10$7qG6YF9hTfXbG9uYx8pD6OmU/3N2ZrZRLkDZz4xOxP9eFJtRjhcqC"
+
+              - column:
+                  name: created_at
+                  valueDate: 2026-01-01T00:00:00
+
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  value: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+              - column:
+                  name: role_id
+                  value: "22222222-2222-2222-2222-222222222222"

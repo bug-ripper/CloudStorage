@@ -6,13 +6,13 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
+@RequestMapping("/api/storage")
 public interface StorageApi {
 
     @PostMapping("/upload")
     FileUploadResponse upload(
             @RequestHeader("X-User-Id") String userId,
-            @RequestPart("file") MultipartFile file
+            @RequestParam("file") MultipartFile file
     );
 
 
