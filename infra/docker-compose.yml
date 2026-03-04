@@ -94,32 +94,27 @@ services:
 
 
 
-#  elasticsearch:
-#    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
-#    container_name: elasticsearch
-#    environment:
-#      - node.name=es-node
-#      - cluster.name=cloud-storage-cluster
-#      - discovery.type=single-node
-#
-#      # vector search
-#      - xpack.security.enabled=false
-#      - xpack.security.http.ssl.enabled=false
-#
-#      # Память
-#      - ES_JAVA_OPTS=-Xms1g -Xmx1g
-#
-#      # knn
-#      - xpack.ml.enabled=false
-#
-#    ulimits:
-#      memlock:
-#        soft: -1
-#        hard: -1
-#
-#
-#    ports:
-#      - "9200:9200"
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false   # отключаем TLS и auth для простого локального теста
+    ports:
+      - "9200:9200"  # HTTP
+      - "9300:9300"  # Transport
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - es-net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"'"]
+      interval: 10s
+      retries: 5
+networks:
+  es-net:
+    driver: bridge
 
 # =====================
 # Volumes
@@ -127,3 +122,4 @@ services:
 volumes:
   minio-data:
   postgres-data:
+  es_data:
