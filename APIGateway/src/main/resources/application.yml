@@ -5,6 +5,14 @@ server:
 spring:
   application:
     name: api-gateway
-
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
 jwt:
   secret: c2Vlbm1lZXR0cnllbmVteWFwcGxlbm90ZXN3aW5nbG9zdGdyYXNzeWVzZmlmdHlzZW4=

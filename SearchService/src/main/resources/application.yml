@@ -1,1 +1,21 @@
-spring.application.name=SearchService
+server:
+  port: 8084
+
+elasticsearch:
+  url: http://localhost:9200
+  index: documents
+
+embedding:
+  service:
+    url: http://localhost:8000/embed
+
+search:
+  page:
+    default-size: 10
+    max-size: 50
+  rrf:
+    window-size: 100
+    rank-constant: 60
+  knn:
+    candidates: 150
+    k: 50

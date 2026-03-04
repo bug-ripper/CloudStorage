@@ -32,7 +32,13 @@ public class GatewayConfig {
                         .route(RequestPredicates.path("/api/metadata/**"),
                                 http("http://localhost:8083"))
                         .filter(addUserIdHeader())
-                        .build());
+                        .build())
+                .and(route("search-service")
+                        .route(RequestPredicates.path("/api/search/**"),
+                                http("http://localhost:8084"))
+                        .filter(addUserIdHeader())
+                        .build()
+                );
     }
 
     private HandlerFilterFunction<ServerResponse, ServerResponse> addUserIdHeader() {
