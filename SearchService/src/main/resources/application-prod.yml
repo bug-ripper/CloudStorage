@@ -1,0 +1,23 @@
+server:
+  port: 8084
+
+elasticsearch:
+  url: ${ELASTICSEARCH_URL}
+  index: ${ELASTICSEARCH_INDEX}
+
+embedding:
+  service:
+    url: ${EMBEDDING_SERVICE_URL}
+
+search:
+  page:
+    default-size: ${SEARCH_PAGE_DEFAULT_SIZE}
+    max-size: ${SEARCH_PAGE_MAX_SIZE}
+
+  rrf:
+    window-size: ${SEARCH_RRF_WINDOW}
+    rank-constant: ${SEARCH_RRF_CONSTANT}
+
+  knn:
+    candidates: ${SEARCH_KNN_CANDIDATES}
+    k: ${SEARCH_KNN_K}
