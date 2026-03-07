@@ -1,0 +1,237 @@
+services:
+
+  # =====================
+  # Reverse proxy (NGINX)
+  # =====================
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./certs:/etc/ssl/certs
+    depends_on:
+      - api-gateway
+    networks:
+      - internal-net
+
+  # =====================
+  # API Gateway
+  # =====================
+  api-gateway:
+    build:
+      context: ../../APIGatewayService
+    container_name: api-gateway
+    env_file:
+      - ../../APIGatewayService/prod.env
+    networks:
+      - internal-net
+    depends_on:
+      - auth-service
+      - metadata-service
+      - search-service
+      - storage-service
+
+  # =====================
+  # Auth Service
+  # =====================
+  auth-service:
+    build:
+      context: ../../AuthService
+    container_name: auth-service
+    env_file:
+      - ../../AuthService/prod.env
+    networks:
+      - internal-net
+    depends_on:
+      - auth-postgres
+      - redis
+
+  # =====================
+  # Metadata Service
+  # =====================
+  metadata-service:
+    build:
+      context: ../../MetadataService
+    container_name: metadata-service
+    env_file:
+      - ../../MetadataService/prod.env
+    networks:
+      - internal-net
+    depends_on:
+      - postgres-metadata
+      - kafka
+
+  # =====================
+  # Search Service
+  # =====================
+  search-service:
+    build:
+      context: ../../SearchService
+    container_name: search-service
+    env_file:
+      - ../../SearchService/prod.env
+    networks:
+      - internal-net
+    depends_on:
+      - elasticsearch
+      - embedding-service
+
+  # =====================
+  # Storage Service
+  # =====================
+  storage-service:
+    build:
+      context: ../../StorageService
+    container_name: storage-service
+    env_file:
+      - ../../StorageService/prod.env
+    networks:
+      - internal-net
+    depends_on:
+      - minio
+
+  # =====================
+  # Embedding Service
+  # =====================
+  embedding-service:
+    build:
+      context: ../../EmbeddingService
+    container_name: embedding-service
+    volumes:
+      - embedding-models:/models
+    networks:
+      - internal-net
+
+  # =====================
+  # Ingest & Indexer Service
+  # =====================
+  ingest-indexer:
+    build:
+      context: ../../IngestIndexerService
+    container_name: ingest-indexer
+    volumes:
+      - ingest-models:/models
+    networks:
+      - internal-net
+    depends_on:
+      - storage-service
+      - elasticsearch
+      - kafka
+
+  # =====================
+  # MinIO (Object Storage)
+  # =====================
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data:/data
+    networks:
+      - internal-net
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+  # =====================
+  # PostgreSQL
+  # =====================
+  postgres-metadata:
+    image: postgres:16
+    container_name: postgres-metadata
+    environment:
+      POSTGRES_DB: metadata
+      POSTGRES_USER: metadata
+      POSTGRES_PASSWORD: metadata
+    volumes:
+      - postgres-metadata-data:/var/lib/postgresql/data
+    networks:
+      - internal-net
+
+  auth-postgres:
+    image: postgres:15
+    container_name: auth-postgres
+    environment:
+      POSTGRES_DB: auth-service
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - internal-net
+
+  redis:
+    image: redis:7
+    container_name: redis
+    networks:
+      - internal-net
+
+  # =====================
+  # Kafka & Zookeeper
+  # =====================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - internal-net
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - internal-net
+
+  # =====================
+  # Elasticsearch
+  # =====================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: -Xms1g -Xmx1g
+      xpack.security.enabled: false
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - internal-net
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+# =====================
+# Networks
+# =====================
+networks:
+  internal-net:
+    driver: bridge
+
+# =====================
+# Volumes
+# =====================
+volumes:
+  minio-data:
+  postgres-metadata-data:
+  postgres-auth-data:
+  es-data:
+  embedding-models:
+  ingest-models:
