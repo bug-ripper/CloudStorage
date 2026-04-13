@@ -1,0 +1,20 @@
+# ===== BUILD STAGE =====
+FROM maven:3.9.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+COPY . .
+
+RUN mvn -pl APIGatewayService -am clean package -DskipTests
+
+
+# ===== RUNTIME =====
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=builder /build/APIGatewayService/target/*.jar app.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java","-jar","app.jar"]
